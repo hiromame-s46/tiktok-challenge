@@ -16,4 +16,5 @@ https://buddies46.stars.ne.jp/satellite/16th/tiktok/
 
 ハッシュタグ「#眠れない夜チャレンジ」の件数推移は [tiktok_hashtag_count_log.md](tiktok_hashtag_count_log.md) にまとめています。
 
-https://buddies46.stars.ne.jp/satellite/16th/tiktok/　ここからも確認することもできます。
+https://buddies46.stars.ne.jp/satellite/16th/tiktok/　
+ここからも確認することもできます。
