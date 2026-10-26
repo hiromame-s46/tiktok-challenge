@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#000000">
+<title>#眠れない夜チャレンジ トラッカー</title>
+<style>
+:root{
+  color-scheme: dark;
+  --bg:#000; --card:#121212; --line:#262626; --text:#fff; --sub:#8a8b91;
+  --cyan:#25f4ee; --pink:#fe2c55;
+  --plus:#2ee06e; --on-plus:#000; --minus:#ff453a; --on-minus:#fff;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg)}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Segoe UI",sans-serif;color:var(--text);line-height:1.5;padding:20px 16px 48px}
+.wrap{max-width:480px;margin:0 auto}
+.tag{font-size:14px;color:var(--sub);font-weight:600}
+h1{font-size:26px;font-weight:800;line-height:1.25;margin:4px 0 18px;text-shadow:2px 2px 0 var(--pink),-2px -2px 0 var(--cyan)}
+h2{font-size:15px;font-weight:700;margin:24px 0 10px}
+
+/* 現在値 */
+.hero{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.big{background:var(--card);border-radius:16px;padding:16px 8px;text-align:center}
+.big .label{font-size:12px;color:var(--sub)}
+.big .num{font-size:38px;font-weight:800;line-height:1.2;letter-spacing:-.02em;text-shadow:2px 2px 0 var(--pink),-2px -2px 0 var(--cyan)}
+.big .num{white-space:nowrap;overflow:hidden;padding:0 3px}
+.big .num small{font-size:14px;margin-left:2px;text-shadow:none}
+.big .num.tap{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.big .hint{font-size:10px;color:var(--sub);min-height:15px}
+.upd{font-size:12px;color:var(--sub);margin:8px 0 0;text-align:center}
+.note{font-size:12px;color:var(--sub);margin:6px 0 0;text-align:center}
+
+/* 現在値内のミニ集計 */
+.big .mini{margin:12px 8px 0;padding-top:10px;border-top:1px solid var(--line);text-align:left}
+.big .mini div{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;column-gap:6px;padding:2px 0}
+.big .mini b{margin-left:auto}
+.big .mini span{font-size:11px;color:var(--sub)}
+.big .mini b{font-size:14px;font-weight:800}
+.big .mini b.plus{color:var(--plus)}
+.big .mini b.minus{color:var(--minus)}
+
+/* Dance practice */
+.mv{position:relative;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:var(--card)}
+.mv iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.mvlink{display:block;font-size:12px;color:var(--sub);margin-top:8px;text-align:center}
+
+/* グラフ */
+.chart{background:var(--card);border-radius:16px;padding:10px 8px 6px;margin-bottom:8px}
+.chart .ct{font-size:12px;font-weight:700;padding:0 8px 4px}
+.chart svg{width:100%;height:auto;display:block}
+.chart text{fill:var(--sub);font-size:9px}
+.chart .empty{font-size:13px;color:var(--sub);text-align:center;padding:36px 12px}
+
+/* 記録 */
+.list{list-style:none;background:var(--card);border-radius:16px;overflow:hidden}
+.list li{padding:12px 16px;border-bottom:1px solid var(--line)}
+.list li:last-child{border-bottom:0}
+.list .t{font-size:12px;color:var(--sub);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.list li.is-latest .t{color:var(--text);font-weight:600}
+.list .latest{font-size:10px;font-weight:800;letter-spacing:.06em;line-height:1;padding:3px 6px;border-radius:4px;background:var(--pink);color:#fff;box-shadow:1.5px 1.5px 0 var(--cyan)}
+.list .row{display:grid;grid-template-columns:1fr 1fr}
+.list .cell:first-child{padding-right:12px;border-right:1px solid var(--line)}
+.list .cell:last-child{padding-left:12px}
+.list .cell{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 6px}
+.list .k{font-size:11px;color:var(--sub)}
+.list .c{font-weight:800;font-size:16px}
+.list .d{display:inline-block;min-width:48px;text-align:center;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--line);color:var(--sub)}
+.list .d.pos{background:var(--plus);color:var(--on-plus)}
+.list .d.neg{background:var(--minus);color:var(--on-minus)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="tag">TikTok ハッシュタグ記録</div>
+  <h1>#眠れない夜チャレンジ</h1>
+
+  <div class="hero">
+    <div class="big">
+      <div class="label">動画件数</div>
+      <div class="num" id="num-c"><span id="now-c">-</span><small>件</small></div>
+      <div class="hint"></div>
+      <div class="mini">
+        <div><span>平均 件/時</span><b id="c-rate">-</b></div>
+        <div><span>前回からの増減</span><b id="c-last">-</b></div>
+      </div>
+    </div>
+    <div class="big">
+      <div class="label">再生回数</div>
+      <div class="num" id="num-v" role="button" tabindex="0"><span id="now-v">-</span><small>回</small></div>
+      <div class="hint" id="hint-v"></div>
+      <div class="mini">
+        <div><span>平均 回/時</span><b id="v-rate">-</b></div>
+        <div><span>前回からの増減</span><b id="v-last">-</b></div>
+      </div>
+    </div>
+  </div>
+  <div class="upd" id="upd"></div>
+  <div class="note" id="note"></div>
+
+  <h2>Dance practice</h2>
+  <div class="mv">
+    <iframe src="https://www.youtube-nocookie.com/embed/5_ump_XVOds" title="櫻坂46 愛MUST BE -Dance Practice-" loading="lazy" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+  <a class="mvlink" href="https://www.youtube.com/watch?v=5_ump_XVOds" target="_blank" rel="noopener">櫻坂46『愛MUST BE -Dance Practice-』をYouTubeで見る</a>
+
+  <h2>推移</h2>
+  <div class="chart"><div class="ct">動画件数</div><div id="chart-c"></div></div>
+  <div class="chart"><div class="ct">再生回数</div><div id="chart-v"></div></div>
+
+  <h2>記録</h2>
+  <ul class="list" id="log"></ul>
+</div>
+
+<script>
+const LOG_URL="https://raw.githubusercontent.com/hiromame-s46/tiktok-challenge/main/tiktok_hashtag_count_log.md";
+
+// 取得できなかった場合の予備データ [JST日時, 動画件数, 再生回数, 目安(頃)]
+const RAW = [
+  ["2026-10-24T17:00",118,null,1],
+  ["2026-10-24T22:00",177,null,1],
+  ["2026-10-25T00:10",195,null,1],
+  ["2026-10-25T15:59",242,null,1],
+  ["2026-10-25T16:31",242,null,0],
+  ["2026-10-25T17:02",247,null,0],
+  ["2026-10-25T17:30",253,null,0],
+  ["2026-10-25T18:01",259,null,0],
+  ["2026-10-25T18:30",268,null,0]
+];
+let data = RAW.map(([t,c,v,a])=>({t:new Date(t+":00+09:00").getTime(),c,v,a:!!a})).sort((a,b)=>a.t-b.t);
+let src="埋め込みデータ";
+
+const $=id=>document.getElementById(id);
+const fmt=new Intl.DateTimeFormat("ja-JP",{timeZone:"Asia/Tokyo",month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit",hour12:false});
+const fmtT=ms=>fmt.format(new Date(ms));
+let fullV=false; // true: 正確な数値 / false: 万・億表記
+const fmtN=(m,v)=>v==null?"-":(m==="v"&&!fullV?fmtV(v):v.toLocaleString("ja-JP"));
+function fmtV(v){
+  if(v>=1e8)return (v/1e8).toFixed(2)+"億";
+  if(v>=1e4)return (v/1e4).toFixed(1)+"万";
+  return v.toLocaleString("ja-JP");
+}
+const sign=(m,n)=>n==null?"-":(n>0?"+":n<0?"-":"")+fmtN(m,Math.abs(n));
+
+// 指標ごとの系列(その指標が記録されている点だけ)
+const series=m=>data.filter(d=>d[m]!=null);
+
+function summary(){
+  const last=data[data.length-1];
+  const hasV=series("v").length>0;
+  const lc=series("c"), lv=series("v");
+  $("now-c").textContent=fmtN("c",lc.length?lc[lc.length-1].c:null);
+  $("now-v").textContent=fmtN("v",lv.length?lv[lv.length-1].v:null);
+  $("upd").textContent="最終確認 "+fmtT(last.t)+(last.a?" 頃":"")+" (JST) ・ "+src;
+  const lastV=lv.length?lv[lv.length-1].v:null;
+  const abbr=lastV!=null&&lastV>=1e4;
+  const nv=$("num-v");
+  nv.classList.toggle("tap",abbr);
+  $("hint-v").textContent=abbr?(fullV?"タップで概数に戻す":"タップで正確な数値"):"";
+  $("note").textContent=hasV?"":"再生回数はログに「再生回数」列を追加すると表示されます";
+
+  ["c","v"].forEach(m=>{
+    const s=series(m);
+    const tone=(id,n)=>{$(id).className=n>0?"plus":n<0?"minus":"";};
+    if(!s.length){["rate","last"].forEach(k=>{$(m+"-"+k).textContent="-";$(m+"-"+k).className="";});return;}
+    const first=s[0], end=s[s.length-1], prev=s[s.length-2];
+    const total=end[m]-first[m], hours=(end.t-first.t)/3600000;
+    $(m+"-rate").textContent=s.length>1&&hours>0?(m==="v"?fmtN("v",Math.round(total/hours)):(total/hours).toFixed(1)):"-";
+    $(m+"-last").textContent=prev?(end[m]===prev[m]?"0":sign(m,end[m]-prev[m])):"-";
+    tone(m+"-last",prev?end[m]-prev[m]:0);
+  });
+}
+
+function fit(el){
+  el.style.fontSize="";
+  let size=38;
+  while(el.scrollWidth>el.clientWidth && size>14){size--;el.style.fontSize=size+"px";}
+}
+function fitAll(){fit($("num-v"));fit($("num-c"));}
+
+function pill(m,i,d){
+  // 直前に同じ指標が記録されている点との差
+  let prev=null;
+  for(let j=i-1;j>=0;j--){if(data[j][m]!=null){prev=data[j];break;}}
+  if(d[m]==null||!prev)return '<span class="d">-</span>';
+  const diff=d[m]-prev[m];
+  if(diff===0)return '<span class="d">±0</span>';
+  return '<span class="d '+(diff>0?"pos":"neg")+'">'+sign(m,diff)+'</span>';
+}
+
+function list(){
+  const ul=$("log");ul.innerHTML="";
+  for(let i=data.length-1;i>=0;i--){
+    const d=data[i];
+    const li=document.createElement("li");
+    if(i===data.length-1)li.className="is-latest";
+    li.innerHTML='<div class="t">'+fmtT(d.t)+(d.a?" 頃":"")+(i===data.length-1?'<span class="latest">LATEST</span>':'')+'</div><div class="row">'
+      +'<div class="cell"><span><span class="k">件数 </span><span class="c">'+fmtN("c",d.c)+'</span></span>'+pill("c",i,d)+'</div>'
+      +'<div class="cell"><span><span class="k">再生 </span><span class="c">'+fmtN("v",d.v)+'</span></span>'+pill("v",i,d)+'</div>'
+      +'</div>';
+    ul.appendChild(li);
+  }
+}
+
+function niceStep(range){
+  const raw=range/4, p=Math.pow(10,Math.floor(Math.log10(raw||1))), n=raw/p;
+  return (n<=1?1:n<=2?2:n<=5?5:10)*p;
+}
+
+function chart(m){
+  const box=$("chart-"+m), pts=series(m);
+  if(pts.length<2){
+    box.innerHTML='<div class="empty">'+(pts.length?"記録が1件のみです":"記録がまだありません")+'</div>';
+    return;
+  }
+  const W=340,H=160,L=38,R=12,T=12,B=26;
+  const t0=pts[0].t,t1=pts[pts.length-1].t;
+  const vs=pts.map(d=>d[m]);
+  const mn=Math.min(...vs),mx=Math.max(...vs);
+  const step=niceStep((mx-mn)||mx||1);
+  const lo=Math.floor(mn/step)*step, hi=Math.ceil(mx/step)*step||step;
+  const x=t=>L+(t1===t0?0:(t-t0)/(t1-t0))*(W-L-R);
+  const y=v=>T+(1-(v-lo)/(hi-lo||1))*(H-T-B);
+  const line=pts.map(d=>x(d.t).toFixed(1)+","+y(d[m]).toFixed(1)).join(" ");
+  let s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+(m==="v"?"再生回数":"動画件数")+'の推移">';
+  for(let v=lo;v<=hi+1e-9;v+=step){
+    s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y(v)+'" y2="'+y(v)+'" stroke="var(--line)"/>';
+    s+='<text x="'+(L-5)+'" y="'+(y(v)+3)+'" text-anchor="end">'+(m==="v"?fmtV(v):v)+'</text>';
+  }
+  s+='<text x="'+L+'" y="'+(H-8)+'" text-anchor="start">'+fmtT(t0)+'</text>';
+  s+='<text x="'+(W-R)+'" y="'+(H-8)+'" text-anchor="end">'+fmtT(t1)+'</text>';
+  s+='<polyline points="'+line+'" fill="none" stroke="var(--pink)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" transform="translate(2,2)"/>';
+  s+='<polyline points="'+line+'" fill="none" stroke="var(--cyan)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>';
+  s+='<circle cx="'+x(t1)+'" cy="'+y(vs[vs.length-1])+'" r="4.5" fill="var(--text)"/>';
+  box.innerHTML=s+'</svg>';
+}
+
+function render(){summary();list();chart("c");chart("v");fitAll();}
+
+function toggleV(){
+  if(!$("num-v").classList.contains("tap"))return;
+  fullV=!fullV;
+  render();
+}
+$("num-v").addEventListener("click",toggleV);
+$("num-v").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();toggleV();}});
+window.addEventListener("resize",fitAll);
+
+// ---- GitHubのログ(Markdown表)をアクセスのたびに読み取る ----
+function parseV(str){
+  const m=String(str).replace(/,/g,"").match(/([\d.]+)\s*(億|万)?/);
+  if(!m)return null;
+  return Math.round(parseFloat(m[1])*(m[2]==="億"?1e8:m[2]==="万"?1e4:1));
+}
+function parseLog(md){
+  const rows=[];let ci=1,vi=-1;
+  md.split(/\r?\n/).forEach(line=>{
+    if(!line.trim().startsWith("|"))return;
+    const cells=line.trim().replace(/^\||\|$/g,"").split("|").map(x=>x.trim());
+    if(cells[0].includes("確認日時")){
+      const c=cells.findIndex(x=>x.includes("件数")&&!x.includes("増減"));
+      ci=c>=0?c:1;
+      vi=cells.findIndex(x=>x.includes("再生")&&!x.includes("増減"));
+      return;
+    }
+    const m=cells[0].match(/^(\d{4})-(\d{2})-(\d{2})\s+(\d{1,2}):(\d{2})\s*(頃)?/);
+    const c=cells[ci]&&cells[ci].replace(/,/g,"").match(/\d+/);
+    if(!m||!c)return;
+    const t=new Date(m[1]+"-"+m[2]+"-"+m[3]+"T"+m[4].padStart(2,"0")+":"+m[5]+":00+09:00").getTime();
+    const v=vi>=0&&cells[vi]&&/\d/.test(cells[vi])?parseV(cells[vi]):null;
+    rows.push({t,c:parseInt(c[0],10),v,a:!!m[6]});
+  });
+  return rows.sort((a,b)=>a.t-b.t);
+}
+async function load(){
+  try{
+    const res=await fetch(LOG_URL+"?t="+Date.now(),{cache:"no-store"});
+    if(!res.ok)throw new Error(res.status);
+    const rows=parseLog(await res.text());
+    if(rows.length){data=rows;src="GitHubから取得";}
+    else src="取得失敗(埋め込みデータを表示)";
+  }catch(e){src="取得失敗(埋め込みデータを表示)";}
+  render();
+}
+render();
+load();
+</script>
+</body>
+</html>
