@@ -10,10 +10,11 @@
 
 これは公式に企画されたものではなく、ファン発の草の根的なムーブメントです。楽曲の世界観や「愛が愛を生む」というテーマへの共感を背景に、グループの認知拡大を目指す取り組みとして機能しています。
 
-https://buddies46.stars.ne.jp/satellite/16th/tiktok/
+動画を一覧にした [特設サイト](https://buddies46.stars.ne.jp/satellite/16th/tiktok/) を公開中です。随時更新しています。
 
 ## 件数の記録
+「#眠れない夜チャレンジ」の投稿件数、総再生回数を追跡しています。30分に1回更新しています。
+件数および再生回数推移データは [こちら](tiktok_hashtag_count_log.md) にコミットします。
+データは自由に使っていただいて大丈夫です。
 
-ハッシュタグ「#眠れない夜チャレンジ」の件数推移は [こちら](tiktok_hashtag_count_log.md) にまとめています。
-
-[サイト](https://buddies46.stars.ne.jp/satellite/tracker/16th/眠れない夜チャレンジ)も確認することができます。
+[こちらのサイト](https://buddies46.stars.ne.jp/satellite/tracker/16th/眠れない夜チャレンジ) からはグラフ付きで確認することができます。
